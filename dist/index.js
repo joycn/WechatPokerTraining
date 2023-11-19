@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,9 +63,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
+var axios_1 = __importDefault(require("axios"));
 var express_1 = __importDefault(require("express"));
 var cors_1 = __importDefault(require("cors"));
 var morgan_1 = __importDefault(require("morgan"));
+var process = __importStar(require("process"));
 var logger = (0, morgan_1.default)("tiny");
 var app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: false }));
@@ -57,21 +82,62 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); });
 // 小程序调用，获取微信 Open ID
-app.get("/api/wx_openid", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+// app.get("/api/wx_openid", async (req: Request, res: Response) => {
+//     if (req.headers["x-wx-source"]) {
+//         res.send(req.headers["x-wx-openid"]);
+//     }
+// });
+app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var content, userMessage, replyContent, headers, config, response;
     return __generator(this, function (_a) {
-        if (req.headers["x-wx-source"]) {
-            res.send(req.headers["x-wx-openid"]);
+        switch (_a.label) {
+            case 0:
+                console.log(req.body);
+                content = {
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "请你用简单易懂的语言回答6岁小朋友的以下问题"
+                        }
+                    ],
+                };
+                userMessage = {
+                    role: "user",
+                    content: req.body.Content
+                };
+                content.messages.push(userMessage);
+                replyContent = {
+                    "MsgType": "text",
+                    "Content": "",
+                    "CreateTime": Date.now(),
+                    "FromUserName": req.body.ToUserName,
+                    "ToUserName": req.body.FromUserName
+                };
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + process.env.AI_TOKEN,
+                };
+                config = {
+                    method: 'POST',
+                    url: 'https://api.aiproxy.io/v1/chat/completions',
+                    data: content,
+                    headers: headers
+                };
+                return [4 /*yield*/, (0, axios_1.default)(config)];
+            case 1:
+                response = _a.sent();
+                console.log(response.data);
+                console.log(response.data.choices[0].message);
+                replyContent.Content = response.data.choices[0].message.content;
+                res.send(JSON.stringify(replyContent));
+                console.log(content);
+                return [2 /*return*/];
         }
-        return [2 /*return*/];
-    });
-}); });
-app.get("/api/echo", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        res.send(req.body);
-        return [2 /*return*/];
     });
 }); });
 var port = process.env.PORT || 80;
+console.log("token: ", process.env.AI_TOKEN);
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

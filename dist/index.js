@@ -137,7 +137,7 @@ app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); });
 var port = process.env.PORT || 80;
-console.log("model: ", process.env.AI_Model);
+console.log("model: ", process.env.AI_MODEL);
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

@@ -62,9 +62,12 @@ app.post("/api/echo", async (req: Request, res: Response) => {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + process.env.AI_TOKEN,
     }
+    const apiHost = process.env.API_HOST || 'api.aiproxy.io';
+    const url = `https://${apiHost}/v1/chat/completions`;
+    console.log(url)
     const config: AxiosRequestConfig = {
         method: 'POST',
-        url: 'https://api.aiproxy.io/v1/chat/completions',
+        url: url,
         data: content,
         headers: headers
     };

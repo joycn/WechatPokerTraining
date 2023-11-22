@@ -88,7 +88,7 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
 //     }
 // });
 app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var content, userMessage, replyContent, headers, config, response;
+    var content, userMessage, replyContent, headers, apiHost, url, config, response;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -118,9 +118,12 @@ app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, voi
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + process.env.AI_TOKEN,
                 };
+                apiHost = process.env.API_HOST || 'api.aiproxy.io';
+                url = "https://".concat(apiHost, "/v1/chat/completions");
+                console.log(url);
                 config = {
                     method: 'POST',
-                    url: 'https://api.aiproxy.io/v1/chat/completions',
+                    url: url,
                     data: content,
                     headers: headers
                 };

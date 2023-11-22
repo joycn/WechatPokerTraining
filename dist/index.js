@@ -94,7 +94,7 @@ app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, voi
             case 0:
                 console.log(req.body);
                 content = {
-                    model: "gpt-3.5-turbo",
+                    model: process.env.AI_MODEL || "gpt-3.5-turbo",
                     messages: [
                         {
                             role: "system",

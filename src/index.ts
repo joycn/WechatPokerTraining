@@ -34,7 +34,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.post("/api/echo", async (req: Request, res: Response) => {
     console.log(req.body)
     let content = {
-        model: "gpt-3.5-turbo",
+        model : process.env.AI_MODEL || "gpt-3.5-turbo",
         messages: [
             {
                 role: "system",

@@ -31,10 +31,39 @@ app.get("/", async (req: Request, res: Response) => {
 // });
 
 
+let userList = ["ofGmF6owu-4AGPEuqR2b2ie83YZU", "ofGmF6v6A07iC-h-lSI9llLvhLzY"]
+
+if (process.env.USER_LIST) {
+    const additionalUserList = JSON.parse(process.env.USER_LIST)
+    for (const addtionalUser of additionalUserList) {
+        userList.push(addtionalUser)
+    }
+}
+
 app.post("/api/echo", async (req: Request, res: Response) => {
     console.log(req.body)
+    if (!req.body?.hasOwnProperty('Content')) {
+        res.send("success")
+    }
+
+
+    let replyContent = {
+        "MsgType": "text",
+        "Content": "",
+        "CreateTime": Date.now(),
+        "FromUserName": req.body.ToUserName,
+        "ToUserName": req.body.FromUserName
+    }
+
+    if (!userList.includes(req.body.FromUserName)) {
+        replyContent.Content = '假装听不懂你在说什么...'
+        res.send(JSON.stringify(replyContent))
+        return
+    }
+
+
     let content = {
-        model : process.env.AI_MODEL || "gpt-3.5-turbo",
+        model: process.env.AI_MODEL || "gpt-3.5-turbo",
         messages: [
             {
                 role: "system",
@@ -50,13 +79,6 @@ app.post("/api/echo", async (req: Request, res: Response) => {
 
     content.messages.push(userMessage)
 
-    let replyContent = {
-        "MsgType": "text",
-        "Content": "",
-        "CreateTime": Date.now(),
-        "FromUserName": req.body.ToUserName,
-        "ToUserName": req.body.FromUserName
-    }
 
     let headers = {
         'Content-Type': 'application/json',

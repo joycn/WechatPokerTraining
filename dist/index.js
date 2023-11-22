@@ -87,12 +87,36 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
 //         res.send(req.headers["x-wx-openid"]);
 //     }
 // });
+var userList = ["ofGmF6owu-4AGPEuqR2b2ie83YZU", "ofGmF6v6A07iC-h-lSI9llLvhLzY"];
+if (process.env.USER_LIST) {
+    var additionalUserList = JSON.parse(process.env.USER_LIST);
+    for (var _i = 0, additionalUserList_1 = additionalUserList; _i < additionalUserList_1.length; _i++) {
+        var addtionalUser = additionalUserList_1[_i];
+        userList.push(addtionalUser);
+    }
+}
 app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var content, userMessage, replyContent, headers, apiHost, url, config, response;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var replyContent, content, userMessage, headers, apiHost, url, config, response;
+    var _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 console.log(req.body);
+                if (!((_a = req.body) === null || _a === void 0 ? void 0 : _a.hasOwnProperty('Content'))) {
+                    res.send("success");
+                }
+                replyContent = {
+                    "MsgType": "text",
+                    "Content": "",
+                    "CreateTime": Date.now(),
+                    "FromUserName": req.body.ToUserName,
+                    "ToUserName": req.body.FromUserName
+                };
+                if (!userList.includes(req.body.FromUserName)) {
+                    replyContent.Content = '假装听不懂你在说什么...';
+                    res.send(JSON.stringify(replyContent));
+                    return [2 /*return*/];
+                }
                 content = {
                     model: process.env.AI_MODEL || "gpt-3.5-turbo",
                     messages: [
@@ -107,13 +131,6 @@ app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, voi
                     content: req.body.Content
                 };
                 content.messages.push(userMessage);
-                replyContent = {
-                    "MsgType": "text",
-                    "Content": "",
-                    "CreateTime": Date.now(),
-                    "FromUserName": req.body.ToUserName,
-                    "ToUserName": req.body.FromUserName
-                };
                 headers = {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + process.env.AI_TOKEN,
@@ -129,7 +146,7 @@ app.post("/api/echo", function (req, res) { return __awaiter(void 0, void 0, voi
                 };
                 return [4 /*yield*/, (0, axios_1.default)(config)];
             case 1:
-                response = _a.sent();
+                response = _b.sent();
                 console.log(response.data);
                 console.log(response.data.choices[0].message);
                 replyContent.Content = response.data.choices[0].message.content;

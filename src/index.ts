@@ -82,7 +82,7 @@ app.post("/api/echo", async (req: Request, res: Response) => {
 
 const port = process.env.PORT || 80;
 
-console.log("token: ", process.env.AI_TOKEN)
+console.log("model: ", process.env.AI_Model)
 
 async function bootstrap() {
     app.listen(port, () => {
